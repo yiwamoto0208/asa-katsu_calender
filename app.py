@@ -16,14 +16,16 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Firebaseの初期化 ---
 # app.pyのこの関数を、以下のコードに丸ごと置き換える
 @st.cache_resource
 def init_firebase():
     """Firebase Admin SDKを初期化する"""
     try:
-        # secretsから「ファイルパス」ではなく「辞書」を直接読み込む
-        creds_dict = st.secrets["firebase"]
+        creds_dict = st.secrets["firebase"].to_dict()
+
+        # 【最終手段】private_keyから強制的に改行コード "\n" を削除する
+        creds_dict['private_key'] = creds_dict['private_key'].replace('\\n', '\n')
+
         creds = credentials.Certificate(creds_dict)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(creds)
