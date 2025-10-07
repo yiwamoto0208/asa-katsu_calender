@@ -17,18 +17,20 @@ st.set_page_config(
 )
 
 # --- Firebaseの初期化 ---
+# app.pyのこの関数を、以下のコードに丸ごと置き換える
 @st.cache_resource
 def init_firebase():
     """Firebase Admin SDKを初期化する"""
     try:
-        key_file_path = st.secrets["firebase"]["key_file_path"]
-        creds = credentials.Certificate(key_file_path)
+        # secretsから「ファイルパス」ではなく「辞書」を直接読み込む
+        creds_dict = st.secrets["firebase"]
+        creds = credentials.Certificate(creds_dict)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(creds)
         return firestore.client()
     except Exception as e:
         st.error(f"Firebaseの初期化に失敗しました: {e}")
-        st.warning("JSONファイル名や場所が正しいか確認してください。")
+        st.warning("Streamlit Community CloudのSecrets設定が正しいか確認してください。")
         return None
 
 db = init_firebase()
